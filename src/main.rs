@@ -10,17 +10,25 @@ use num_cpus;
 
 fn main() {
     let mut treshold: f32 = 0.0;
+    let mut reverse: bool = false;
 
-    setup(&mut treshold);
+    setup(&mut treshold, &mut reverse);
 
-    wait(&mut treshold);
+    wait(&mut treshold, &mut reverse);
 }
 
-fn wait(treshold: &mut f32) {
-    println!("Waiting load average less than {}", treshold);
+fn wait(treshold: &mut f32, reverse: &mut bool) {
+    if !*reverse {
+        println!("Waiting load average less than {}", treshold);
+    } else {
+        println!("Waiting load average greater than {}", treshold);
+    }
+    
     let sys = System::new();
-    while get_load_average(&sys) > *treshold {
-        thread::sleep(Duration::from_millis(1000))
+    let mut la = get_load_average(&sys);
+    while (la > *treshold && !*reverse) || (la < *treshold && *reverse){
+        thread::sleep(Duration::from_millis(1000));
+        la = get_load_average(&sys);
     }
 }
 
@@ -35,7 +43,7 @@ fn get_load_average(sys: &System) -> f32 {
     return result;
 }
 
-fn setup(treshold: &mut f32) {
+fn setup(treshold: &mut f32, reverse: &mut bool) {
     // Prints each argument on a separate line
     for argument in env::args() {
         println!("{}", argument);
@@ -65,6 +73,14 @@ fn setup(treshold: &mut f32) {
         .get_matches();
 
     set_treshold(&matches, treshold);
+
+    set_reverse(&matches, reverse);
+}
+
+fn set_reverse(matches: &ArgMatches, reverse: &mut bool) {
+    if matches.is_present("reverse") {
+        *reverse = true;
+    }
 }
 
 fn set_treshold(matches: &ArgMatches, treshold: &mut f32) {
