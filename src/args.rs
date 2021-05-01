@@ -1,5 +1,7 @@
 use clap::{App, Arg};
 
+const U64_MAX_STR: &str = "18446744073709551615";
+
 pub fn define() -> App<'static> {
     let app = App::new("waitla")
         .version("0.1.0")
@@ -29,6 +31,14 @@ pub fn define() -> App<'static> {
                 .takes_value(true)
                 .required(false)
                 .about("Set sleep time in milliseconds"),
+        ).arg(
+            Arg::new("max_time")
+                .short('M')
+                .long("max-time")
+                .default_value(U64_MAX_STR)
+                .takes_value(true)
+                .required(false)
+                .about("Set maximum waiting time in seconds. Default: forever"),
         );
 
     return app;
