@@ -5,8 +5,9 @@ use std::time::Duration;
 use systemstat::{Platform, System};
 
 use clap::ArgMatches;
-use clap::{App, Arg};
 use num_cpus;
+
+mod args;
 
 fn main() {
     let mut treshold: f32 = 0.0;
@@ -24,10 +25,9 @@ fn wait(treshold: &mut f32, reverse: &mut bool, sleep_millis: &mut u64) {
     } else {
         println!("Waiting load average greater than {}", treshold);
     }
-    
     let sys = System::new();
     let mut la = get_load_average(&sys);
-    while (la > *treshold && !*reverse) || (la < *treshold && *reverse){
+    while (la > *treshold && !*reverse) || (la < *treshold && *reverse) {
         thread::sleep(Duration::from_millis(*sleep_millis));
         la = get_load_average(&sys);
     }
@@ -50,37 +50,7 @@ fn setup(treshold: &mut f32, reverse: &mut bool, sleep_millis: &mut u64) {
         println!("{}", argument);
     }
 
-    let matches = App::new("waitla")
-        .version("0.1.0")
-        .author("Javier Yáñez")
-        .about("Wait for Load Average")
-        .arg(
-            Arg::new("treshold")
-                .short('t')
-                .long("load-average-treshold")
-                .default_value(&*num_cpus::get().to_string())
-                .takes_value(true)
-                .required(false)
-                .about("Set load average treshold"),
-        )
-        .arg(
-            Arg::new("reverse")
-                .short('r')
-                .long("reverse")
-                .takes_value(false)
-                .required(false)
-                .about("Waits the load average to be major than the treshold, rather than lower"),
-        )
-        .arg(
-            Arg::new("sleep_millis")
-                .short('s')
-                .long("sleep-millis")
-                .takes_value(true)
-                .required(false)
-                .about("Set sleep time in milliseconds"),
-        )
-        .get_matches();
-
+    let matches = args::define().get_matches();
     set_treshold(&matches, treshold);
 
     set_reverse(&matches, reverse);
@@ -107,13 +77,17 @@ fn set_reverse(matches: &ArgMatches, reverse: &mut bool) {
 }
 
 fn set_treshold(matches: &ArgMatches, treshold: &mut f32) {
-    let treshold_str = matches.value_of("treshold").unwrap();
+    if matches.is_present("treshold") {
+        let treshold_str = matches.value_of("treshold").unwrap();
 
-    match treshold_str.parse::<f32>() {
-        Ok(t) => *treshold = t,
-        Err(_) => {
-            println!("That's not a valid load average! {}", treshold_str);
-            process::exit(0x0100);
+        match treshold_str.parse::<f32>() {
+            Ok(t) => *treshold = t,
+            Err(_) => {
+                println!("That's not a valid load average! {}", treshold_str);
+                process::exit(0x0100);
+            }
         }
+    } else {
+        *treshold = num_cpus::get() as f32;
     }
 }
