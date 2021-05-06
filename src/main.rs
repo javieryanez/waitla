@@ -47,11 +47,13 @@ fn wait(
     }
     let sys = System::new();
     let mut la = get_load_average(&sys);
-    let mut begin_time = SystemTime::now();
+    let begin_time = SystemTime::now();
+    let mut elapsed_time = 0;
     thread::sleep(Duration::from_millis(*min_time * 1000));
-    while must_wait(treshold, reverse, max_time, &mut la, &mut begin_time) {
+    while must_wait(treshold, reverse, max_time, &mut la, &mut elapsed_time) {
         thread::sleep(Duration::from_millis(*sleep_millis));
         la = get_load_average(&sys);
+        elapsed_time = begin_time.elapsed().unwrap().as_secs();
     }
 }
 
@@ -60,10 +62,48 @@ fn must_wait(
     reverse: &mut bool,
     max_time: &mut u64,
     la: &mut f32,
-    begin_time: &mut SystemTime,
+    elapsed_time: &mut u64,
 ) -> bool {
+    println!("Cond1: {}", la > &mut *treshold && !*reverse);
+    println!("Cond2: {}", la < &mut *treshold && *reverse);
     ((la > &mut *treshold && !*reverse) || (la < &mut *treshold && *reverse))
-        && (begin_time.elapsed().unwrap().as_secs() < *max_time)
+        && (*elapsed_time < *max_time)
+}
+
+#[test]
+fn test_must_wait() {
+    assert_eq!(
+        must_wait(&mut 4.0, &mut false, &mut 5, &mut 6.0, &mut 4),
+        true
+    );
+    assert_eq!(
+        must_wait(&mut 7.0, &mut false, &mut 5, &mut 6.0, &mut 4),
+        false
+    );
+    assert_eq!(
+        must_wait(&mut 4.0, &mut true, &mut 5, &mut 6.0, &mut 4),
+        false
+    );
+    assert_eq!(
+        must_wait(&mut 7.0, &mut true, &mut 5, &mut 6.0, &mut 4),
+        true
+    );
+    assert_eq!(
+        must_wait(&mut 4.0, &mut false, &mut 3, &mut 6.0, &mut 4),
+        false
+    );
+    assert_eq!(
+        must_wait(&mut 7.0, &mut false, &mut 3, &mut 6.0, &mut 4),
+        false
+    );
+    assert_eq!(
+        must_wait(&mut 4.0, &mut true, &mut 3, &mut 6.0, &mut 4),
+        false
+    );
+    assert_eq!(
+        must_wait(&mut 7.0, &mut true, &mut 3, &mut 6.0, &mut 4),
+        false
+    );
 }
 
 fn get_load_average(sys: &System) -> f32 {
