@@ -62,9 +62,8 @@ fn must_wait(
     la: &mut f32,
     begin_time: &mut SystemTime,
 ) -> bool {
-    (la > &mut *treshold && !*reverse)
-        || (la < &mut *treshold && *reverse)
-            && (begin_time.elapsed().unwrap().as_secs() < *max_time)
+    ((la > &mut *treshold && !*reverse) || (la < &mut *treshold && *reverse))
+        && (begin_time.elapsed().unwrap().as_secs() < *max_time)
 }
 
 fn get_load_average(sys: &System) -> f32 {
