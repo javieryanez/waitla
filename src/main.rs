@@ -14,13 +14,32 @@ fn main() {
     let mut reverse: bool = false;
     let mut sleep_millis: u64 = 1000;
     let mut max_time: u64 = u64::MAX;
+    let mut min_time: u64 = 0;
 
-    setup(&mut treshold, &mut reverse, &mut sleep_millis, &mut max_time);
+    setup(
+        &mut treshold,
+        &mut reverse,
+        &mut sleep_millis,
+        &mut max_time,
+        &mut min_time,
+    );
 
-    wait(&mut treshold, &mut reverse, &mut sleep_millis, &mut max_time);
+    wait(
+        &mut treshold,
+        &mut reverse,
+        &mut sleep_millis,
+        &mut max_time,
+        &mut min_time,
+    );
 }
 
-fn wait(treshold: &mut f32, reverse: &mut bool, sleep_millis: &mut u64, max_time: &mut u64) {
+fn wait(
+    treshold: &mut f32,
+    reverse: &mut bool,
+    sleep_millis: &mut u64,
+    max_time: &mut u64,
+    min_time: &mut u64,
+) {
     if !*reverse {
         println!("Waiting load average less than {}", treshold);
     } else {
@@ -28,12 +47,24 @@ fn wait(treshold: &mut f32, reverse: &mut bool, sleep_millis: &mut u64, max_time
     }
     let sys = System::new();
     let mut la = get_load_average(&sys);
-    let begin_time = SystemTime::now();
-    while (la > *treshold && !*reverse) || (la < *treshold && *reverse) &&
-    (begin_time.elapsed().unwrap().as_secs() < *max_time) {
+    let mut begin_time = SystemTime::now();
+    thread::sleep(Duration::from_millis(*min_time * 1000));
+    while must_wait(treshold, reverse, max_time, &mut la, &mut begin_time) {
         thread::sleep(Duration::from_millis(*sleep_millis));
         la = get_load_average(&sys);
     }
+}
+
+fn must_wait(
+    treshold: &mut f32,
+    reverse: &mut bool,
+    max_time: &mut u64,
+    la: &mut f32,
+    begin_time: &mut SystemTime,
+) -> bool {
+    (la > &mut *treshold && !*reverse)
+        || (la < &mut *treshold && *reverse)
+            && (begin_time.elapsed().unwrap().as_secs() < *max_time)
 }
 
 fn get_load_average(sys: &System) -> f32 {
@@ -47,7 +78,13 @@ fn get_load_average(sys: &System) -> f32 {
     return result;
 }
 
-fn setup(treshold: &mut f32, reverse: &mut bool, sleep_millis: &mut u64, max_time: &mut u64) {
+fn setup(
+    treshold: &mut f32,
+    reverse: &mut bool,
+    sleep_millis: &mut u64,
+    max_time: &mut u64,
+    min_time: &mut u64,
+) {
     // Prints each argument on a separate line
     for argument in env::args() {
         println!("{}", argument);
@@ -61,6 +98,20 @@ fn setup(treshold: &mut f32, reverse: &mut bool, sleep_millis: &mut u64, max_tim
     set_sleep_time(&matches, sleep_millis);
 
     set_max_time(&matches, max_time);
+
+    set_min_time(&matches, min_time);
+}
+
+fn set_min_time(matches: &ArgMatches, min_time: &mut u64) {
+    let min_time_str = matches.value_of("min_time").unwrap();
+
+    match min_time_str.parse::<u64>() {
+        Ok(m) => *min_time = m,
+        Err(_) => {
+            println!("That's not a valid minimum time! {}", min_time_str);
+            process::exit(0x001);
+        }
+    }
 }
 
 fn set_max_time(matches: &ArgMatches, max_time: &mut u64) {

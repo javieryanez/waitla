@@ -31,7 +31,8 @@ pub fn define() -> App<'static> {
                 .takes_value(true)
                 .required(false)
                 .about("Set sleep time in milliseconds"),
-        ).arg(
+        )
+        .arg(
             Arg::new("max_time")
                 .short('M')
                 .long("max-time")
@@ -39,6 +40,15 @@ pub fn define() -> App<'static> {
                 .takes_value(true)
                 .required(false)
                 .about("Set maximum waiting time in seconds. Default: forever"),
+        )
+        .arg(
+            Arg::new("min_time")
+                .short('m')
+                .long("min-time")
+                .default_value("0")
+                .takes_value(true)
+                .required(false)
+                .about("Set minimum waiting time in seconds. Default: 0"),
         );
 
     return app;
