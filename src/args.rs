@@ -49,6 +49,14 @@ pub fn define() -> App<'static> {
                 .takes_value(true)
                 .required(false)
                 .about("Set minimum waiting time in seconds. Default: 0"),
+        )
+        .arg(
+            Arg::new("verbose")
+                .short('v')
+                .long("verbose")
+                .takes_value(false)
+                .required(false)
+                .about("Make the operation more talkative"),
         );
 
     return app;

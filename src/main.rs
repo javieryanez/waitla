@@ -1,4 +1,3 @@
-use std::env;
 use std::process;
 use std::thread;
 use std::time::{Duration, SystemTime};
@@ -15,6 +14,7 @@ fn main() {
     let mut sleep_millis: u64 = 1000;
     let mut max_time: u64 = u64::MAX;
     let mut min_time: u64 = 0;
+    let mut verbose: bool = false;
 
     setup(
         &mut treshold,
@@ -22,6 +22,7 @@ fn main() {
         &mut sleep_millis,
         &mut max_time,
         &mut min_time,
+        &mut verbose,
     );
 
     wait(
@@ -30,6 +31,7 @@ fn main() {
         &mut sleep_millis,
         &mut max_time,
         &mut min_time,
+        &mut verbose,
     );
 }
 
@@ -39,11 +41,14 @@ fn wait(
     sleep_millis: &mut u64,
     max_time: &mut u64,
     min_time: &mut u64,
+    verbose: &mut bool,
 ) {
-    if !*reverse {
-        println!("Waiting load average less than {}", treshold);
-    } else {
-        println!("Waiting load average greater than {}", treshold);
+    if *verbose {
+        if !*reverse {
+            println!("Waiting load average less than {}", treshold);
+        } else {
+            println!("Waiting load average greater than {}", treshold);
+        }
     }
     let sys = System::new();
     let mut la = get_load_average(&sys);
@@ -64,8 +69,6 @@ fn must_wait(
     la: &mut f32,
     elapsed_time: &mut u64,
 ) -> bool {
-    println!("Cond1: {}", la > &mut *treshold && !*reverse);
-    println!("Cond2: {}", la < &mut *treshold && *reverse);
     ((la > &mut *treshold && !*reverse) || (la < &mut *treshold && *reverse))
         && (*elapsed_time < *max_time)
 }
@@ -123,12 +126,8 @@ fn setup(
     sleep_millis: &mut u64,
     max_time: &mut u64,
     min_time: &mut u64,
+    verbose: &mut bool,
 ) {
-    // Prints each argument on a separate line
-    for argument in env::args() {
-        println!("{}", argument);
-    }
-
     let matches = args::define().get_matches();
     set_treshold(&matches, treshold);
 
@@ -139,6 +138,14 @@ fn setup(
     set_max_time(&matches, max_time);
 
     set_min_time(&matches, min_time);
+
+    set_verbose(&matches, verbose);
+}
+
+fn set_verbose(matches: &ArgMatches, verbose: &mut bool) {
+    if matches.is_present("verbose") {
+        *verbose = true;
+    }
 }
 
 fn set_min_time(matches: &ArgMatches, min_time: &mut u64) {
