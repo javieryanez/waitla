@@ -10,3 +10,6 @@ edition = "2018"
 systemstat = { git = "https://github.com/unrelentingtech/systemstat", tag="v0.1.7" }
 clap = "3.0.0-beta.2"
 num_cpus = "1.13.0"
+
+[profile.release]
+lto = true
