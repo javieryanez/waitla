@@ -50,3 +50,4 @@ git clone https://github.com/javieryanez/waitla.git
 cd waitla
 cargo build --release
 ```
+You can choose the binary in *target/release/* directory.
