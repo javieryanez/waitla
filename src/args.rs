@@ -6,14 +6,14 @@ pub fn define() -> App<'static> {
     let app = App::new("waitla")
         .version(env!("CARGO_PKG_VERSION"))
         .author("Javier Yáñez")
-        .about("Wait until the one minute load average reaches the indicated threshold.")
+        .about("Waits until the one minute load average reaches the indicated threshold.")
         .arg(
             Arg::new("treshold")
                 .short('t')
                 .long("load-average-treshold")
                 .takes_value(true)
                 .required(false)
-                .about("Set load average treshold"),
+                .about("Sets load average treshold"),
         )
         .arg(
             Arg::new("reverse")
@@ -30,7 +30,7 @@ pub fn define() -> App<'static> {
                 .default_value("1000")
                 .takes_value(true)
                 .required(false)
-                .about("Set sleep time in milliseconds"),
+                .about("Sets sleep time in milliseconds"),
         )
         .arg(
             Arg::new("max_time")
@@ -39,7 +39,7 @@ pub fn define() -> App<'static> {
                 .default_value(U64_MAX_STR)
                 .takes_value(true)
                 .required(false)
-                .about("Set maximum waiting time in seconds."),
+                .about("Sets maximum waiting time in seconds"),
         )
         .arg(
             Arg::new("min_time")
@@ -48,7 +48,7 @@ pub fn define() -> App<'static> {
                 .default_value("0")
                 .takes_value(true)
                 .required(false)
-                .about("Set minimum waiting time in seconds."),
+                .about("Sets minimum waiting time in seconds"),
         )
         .arg(
             Arg::new("verbose")
@@ -56,7 +56,7 @@ pub fn define() -> App<'static> {
                 .long("verbose")
                 .takes_value(false)
                 .required(false)
-                .about("Make the operation more talkative"),
+                .about("Makes the operation more talkative"),
         );
 
     return app;
