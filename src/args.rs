@@ -4,7 +4,7 @@ const U64_MAX_STR: &str = "18446744073709551615";
 
 pub fn define() -> App<'static> {
     let app = App::new("waitla")
-        .version("0.1.0")
+        .version(env!("CARGO_PKG_VERSION"))
         .author("Javier Yáñez")
         .about("Wait until the one minute load average reaches the indicated threshold.")
         .arg(
