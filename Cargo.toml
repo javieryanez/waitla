@@ -1,7 +1,7 @@
 [package]
 name = "waitla"
 version = "1.0.0"
-authors = ["javier"]
+authors = ["Javier Yanez"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
