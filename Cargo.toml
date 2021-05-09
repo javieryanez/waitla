@@ -1,7 +1,7 @@
 [package]
 name = "waitla"
-version = "0.1.0"
-authors = ["javier"]
+version = "1.0.0"
+authors = ["Javier Yanez"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -10,3 +10,6 @@ edition = "2018"
 systemstat = { git = "https://github.com/unrelentingtech/systemstat", tag="v0.1.7" }
 clap = "3.0.0-beta.2"
 num_cpus = "1.13.0"
+
+[profile.release]
+lto = true
