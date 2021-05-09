@@ -6,7 +6,7 @@ pub fn define() -> App<'static> {
     let app = App::new("waitla")
         .version("0.1.0")
         .author("Javier Yáñez")
-        .about("Wait for Load Average")
+        .about("Wait until the one minute load average reaches the indicated threshold.")
         .arg(
             Arg::new("treshold")
                 .short('t')
@@ -39,7 +39,7 @@ pub fn define() -> App<'static> {
                 .default_value(U64_MAX_STR)
                 .takes_value(true)
                 .required(false)
-                .about("Set maximum waiting time in seconds. Default: forever"),
+                .about("Set maximum waiting time in seconds."),
         )
         .arg(
             Arg::new("min_time")
@@ -48,7 +48,7 @@ pub fn define() -> App<'static> {
                 .default_value("0")
                 .takes_value(true)
                 .required(false)
-                .about("Set minimum waiting time in seconds. Default: 0"),
+                .about("Set minimum waiting time in seconds."),
         )
         .arg(
             Arg::new("verbose")
